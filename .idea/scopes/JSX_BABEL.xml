@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="JSX-BABEL" pattern="file:*.jsx" />
+</component>
