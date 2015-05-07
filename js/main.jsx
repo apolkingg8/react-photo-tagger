@@ -1,4 +1,5 @@
 import React from 'react'
+import _ from 'underscore'
 
 var Img = React.createClass({
     render: function() {
@@ -30,6 +31,7 @@ var ChoosingBox = React.createClass({
             left: this.props['positionX'],
             width: this.props['width'],
             height: this.props['height'],
+            visibility: this.props['show'],
             border: '2px solid #fff'
         }
     },
@@ -50,14 +52,18 @@ var Wrap = React.createClass({
         return {
             offsetTop: 0,
             offsetLeft: 0,
+
             mouseDownX: 0,
             mouseDownY: 0,
             mouseUpX: 0,
             mouseUpY: 0,
-            mouseRelativedX: 0,
-            mouseRelativedY: 0,
+            mouseX: 0,
+            mouseY: 0,
+
+            choosingBoxShow: false,
             choosingBoxWidth: 0,
             choosingBoxHeight: 0,
+
             dragging: false
         };
     },
@@ -71,22 +77,37 @@ var Wrap = React.createClass({
     },
 
     componentDidMount: function() {
-        this.state.offsetTop = this.getDOMNode().offsetTop;
-        this.state.offsetLeft = this.getDOMNode().offsetLeft;
+
+        this.setState({
+            offsetTop: this.getDOMNode().offsetTop,
+            offsetLeft: this.getDOMNode().offsetLeft
+        });
     },
 
     onMouseMoveHandler: function(e) {
-        if(this.state.dragging) {
-            e.persist();
-            //console.log('mouse move', e);
-            this.state.mouseRelativedX = this._getRelativedX(e);
-            this.state.mouseRelativedY = this._getRelativedY(e);
-            console.log(this.state.mouseRelativedX, this.state.mouseRelativedY);
+        var that = this;
 
-            this.setState({
-                choosingBoxWidth: this.state.mouseRelativedX - this.state.mouseDownX,
-                choosingBoxHeight: this.state.mouseRelativedY - this.state.mouseDownY
-            });
+        var onMove = _.throttle(function(){
+            console.log('mouse move');
+
+            that.setState({
+                mouseX: that._getRelativedX(e),
+                mouseY: that._getRelativedY(e)
+            })
+        }, 100);
+
+        onMove();
+
+
+        if(this.state.dragging) {
+            _.throttle(function(){
+                console.log(that.state.mouseX, that.state.mouseY);
+
+                that.setState({
+                    choosingBoxWidth: that.state.mouseX - that.state.mouseDownX,
+                    choosingBoxHeight: that.state.mouseY - that.state.mouseDownY
+                });
+            }, 100);
         }
     },
 
@@ -133,7 +154,7 @@ var Wrap = React.createClass({
 
     render: function() {
 
-        console.log(this);
+        console.log('render');
 
         return (
             <div className="react-photo-tagger-wrap"
@@ -141,12 +162,15 @@ var Wrap = React.createClass({
                  onMouseUp={this.onMouseUpHandler}
                  onMouseMove={this.onMouseMoveHandler}
                  style={this.setStyle()}>
+
                 <ChoosingBox
                     positionX={this.state.mouseDownX}
                     positionY={this.state.mouseDownY}
                     width={this.state.choosingBoxWidth}
-                    height={this.state.choosingBoxHeight}>
+                    height={this.state.choosingBoxHeight}
+                    show={this.state.choosingBoxShow}>
                 </ChoosingBox>
+
                 <Img src={this.props['imgSrc']}/>
             </div>
         )
