@@ -1,115 +1,8 @@
 import React from 'react'
-import _ from 'underscore'
-import Draggable from 'react-draggable'
 
-var Img = React.createClass({
-    render: function() {
-
-        var _style = {
-            width: '100%',
-            height: '100%'
-        };
-
-        return (
-            <img src={this.props['src']}
-                 style={_style}/>
-        )
-    }
-});
-
-
-var ChoosingBox = React.createClass({
-
-    getInitialState: function() {
-        return {
-        }
-    },
-
-    getDefaultProps: function() {
-        return {
-            positionX: 0,
-            positionY: 0,
-            width: 0,
-            height: 0,
-            show: false
-        }
-    },
-
-    getStyle: function() {
-        var _style = {
-            position: 'absolute',
-            top: this.props['positionY'],
-            left: this.props['positionX'],
-            width: this.props['width'],
-            height: this.props['height'],
-            visibility: this.props['show'] ? 'visible' : 'hidden',
-            border: '2px solid #fff'
-        };
-
-        if(this.props['width'] < 0) {
-            _style.left += this.props['width'];
-            _style.width = Math.abs(this.props['width']);
-        }
-
-        if(this.props['height'] < 0) {
-            _style.top += this.props['height'];
-            _style.height = Math.abs(this.props['height']);
-        }
-
-        return _style
-    },
-
-    onDragHandler: function(e) {
-        console.log('hi');
-    },
-
-    render: function() {
-        return (
-            <div style={this.getStyle()}
-                 onDrag={this.onDragHandler()}>
-            </div>
-        )
-    }
-});
-
-
-
-
-var CommandBox = React.createClass({
-    getInitialState: function() {
-        return {
-            show: false
-        }
-    },
-
-    getDefaultProps: function() {
-        return {
-            positionX: 0,
-            positionY: 0
-        }
-    },
-
-    getStyle: function() {
-        return {
-            position: 'absolute',
-            top: 0,
-            left: 0,
-            width: '80px',
-            height: '50px',
-            visibility: this.state.show ? 'visible' : 'hidden',
-            backgroundColor: '#d1d1d1'
-        }
-    },
-
-    render: function() {
-        return (
-            <div style={this.getStyle()}>
-            </div>
-        )
-    }
-});
-
-
+import Img from './Img'
+import ChoosingBox from './ChoosingBox'
+import CommandBox from './CommandBox'
 
 
 var Wrap = React.createClass({
@@ -228,7 +121,6 @@ var Wrap = React.createClass({
 
         return {
             position: 'relative',
-            top: '20px',
             width: this.props['width'],
             height: this.props['height']
         };
@@ -262,10 +154,4 @@ var Wrap = React.createClass({
     }
 });
 
-React.render(
-    <Wrap
-        imgSrc="test.jpeg"
-        width="250px"
-        height="200px">
-    </Wrap>
-    , document.body);
+export default Wrap;
