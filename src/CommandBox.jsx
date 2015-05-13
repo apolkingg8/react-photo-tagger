@@ -3,25 +3,25 @@ import React from 'react'
 var CommandBox = React.createClass({
     getInitialState: function() {
         return {
-            show: false
         }
     },
 
     getDefaultProps: function() {
         return {
             positionX: 0,
-            positionY: 0
+            positionY: 0,
+            show: false
         }
     },
 
     getStyle: function() {
         return {
             position: 'absolute',
-            top: 0,
-            left: 0,
+            top: this.props['positionY'],
+            left: this.props['positionX'],
             width: '80px',
             height: '50px',
-            visibility: this.state.show ? 'visible' : 'hidden',
+            visibility: this.props['show'] ? 'visible' : 'hidden',
             backgroundColor: '#d1d1d1'
         }
     },

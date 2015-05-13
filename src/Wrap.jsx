@@ -24,6 +24,8 @@ var Wrap = React.createClass({
             choosingBoxWidth: 0,
             choosingBoxHeight: 0,
 
+            commandBoxShow: false,
+
             dragging: false
         };
     },
@@ -92,7 +94,8 @@ var Wrap = React.createClass({
                 mouseX: this._getRelativedX(e),
                 mouseY: this._getRelativedY(e),
                 mouseDownX: this._getRelativedX(e),
-                mouseDownY: this._getRelativedY(e)
+                mouseDownY: this._getRelativedY(e),
+                commandBoxShow: false
             });
         }
     },
@@ -103,7 +106,8 @@ var Wrap = React.createClass({
         this.setState({
             dragging : false,
             mouseUpX : this._getRelativedX(e),
-            mouseUpY : this._getRelativedY(e)
+            mouseUpY : this._getRelativedY(e),
+            commandBoxShow: true
         });
     },
 
@@ -145,7 +149,12 @@ var Wrap = React.createClass({
                     show={this.state.choosingBoxShow}>
                 </ChoosingBox>
 
-                <CommandBox>
+                <CommandBox
+                    positionX={this.state.mouseDownX}
+                    positionY={this.state.mouseDownY + this.state.choosingBoxHeight + 5}
+                    //width={}
+                    //height={}
+                    show={this.state.commandBoxShow}>
                 </CommandBox>
 
                 <Img src={this.props['imgSrc']}/>
