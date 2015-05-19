@@ -2,7 +2,7 @@ import React from 'react'
 
 import Img from './Img'
 import ChoosingBox from './ChoosingBox'
-import CommandBox from './CommandBox'
+
 
 
 var Wrap = React.createClass({
@@ -21,12 +21,11 @@ var Wrap = React.createClass({
             mouseY: 0,
 
             choosingBoxShow: false,
-            choosingBoxWidth: 0,
-            choosingBoxHeight: 0,
 
             commandBoxShow: false,
 
-            dragging: false
+            choosing: false,
+            mouseDownInChoosingBox: false
         };
     },
 
@@ -34,7 +33,9 @@ var Wrap = React.createClass({
         return {
             imgSrc: '',
             width: '100%',
-            height: '100%'
+            height: '100%',
+            choosingBoxStyle: {},
+            commandBoxStyle: {}
         }
     },
 
@@ -48,13 +49,20 @@ var Wrap = React.createClass({
 
     _isInChoosingBox: function(e) {
 
-        var _x = this._getRelativedX(e);
-        var _y = this._getRelativedY(e);
+        let x = this._getRelativedX(e);
+        let y = this._getRelativedY(e);
 
-        return (
-            (((this.state.mouseDownX) < _x) && (_x < (this.state.mouseDownX + this.state.choosingBoxWidth))) &&
-            (((this.state.mouseDownY) < _y) && (_y < (this.state.mouseDownY + this.state.choosingBoxHeight)))
-        )
+        let result = (
+            (((this.state.mouseDownX) < x) && (x < this.state.mouseUpX))
+            &&
+            (((this.state.mouseDownY) < y) && (y < this.state.mouseUpY))
+        );
+
+        this.setState({
+            mouseDownInChoosingBox: result
+        });
+
+        return result
     },
 
     componentDidMount: function() {
@@ -69,15 +77,15 @@ var Wrap = React.createClass({
         var that = this;
         //console.log('mouse move');
 
-        if(this.state.dragging) {
+        if(this.state.choosing) {
             console.log(that.state.mouseX, that.state.mouseY);
 
             that.setState({
                 mouseX: that._getRelativedX(e),
                 mouseY: that._getRelativedY(e),
-                choosingBoxWidth: that.state.mouseX - that.state.mouseDownX,
-                choosingBoxHeight: that.state.mouseY - that.state.mouseDownY
             });
+        } else {
+
         }
     },
 
@@ -87,9 +95,7 @@ var Wrap = React.createClass({
         if(!this._isInChoosingBox(e)) {
             e.preventDefault();
             this.setState({
-                dragging: true,
-                choosingBoxWidth: 0,
-                choosingBoxHeight: 0,
+                choosing: true,
                 choosingBoxShow: true,
                 mouseX: this._getRelativedX(e),
                 mouseY: this._getRelativedY(e),
@@ -103,19 +109,21 @@ var Wrap = React.createClass({
     onMouseUpHandler: function(e) {
         console.log('mouse up', e);
 
-        this.setState({
-            dragging : false,
-            mouseUpX : this._getRelativedX(e),
-            mouseUpY : this._getRelativedY(e),
-            commandBoxShow: true
-        });
+        if(!this.state.mouseDownInChoosingBox) {
+            this.setState({
+                choosing: false,
+                mouseUpX: this._getRelativedX(e),
+                mouseUpY: this._getRelativedY(e),
+                commandBoxShow: true
+            });
+        }
     },
 
     onMouseLeaveHandler: function(e) {
         console.log('mouse leave', e);
 
         this.setState({
-            dragging : false,
+            choosing : false,
             mouseUpX : this._getRelativedX(e),
             mouseUpY : this._getRelativedY(e)
         });
@@ -126,13 +134,15 @@ var Wrap = React.createClass({
         return {
             position: 'relative',
             width: this.props['width'],
-            height: this.props['height']
+            height: this.props['height'],
+            overflow: 'visible'
         };
     },
 
     render: function() {
-
         console.log('render');
+
+        let state = this.state;
 
         return (
             <div className="react-photo-tagger-wrap"
@@ -142,20 +152,14 @@ var Wrap = React.createClass({
                  style={this.getStyle()}>
 
                 <ChoosingBox
-                    positionX={this.state.mouseDownX}
-                    positionY={this.state.mouseDownY}
-                    width={this.state.choosingBoxWidth}
-                    height={this.state.choosingBoxHeight}
-                    show={this.state.choosingBoxShow}>
+                    _style={this.props['choosingBoxStyle']}
+                    commandBoxStyle={this.props['commandBoxStyle']}
+                    startX={state.mouseDownX}
+                    startY={state.mouseDownY}
+                    endX={state.choosing ? state.mouseX : state.mouseUpX}
+                    endY={state.choosing ? state.mouseY : state.mouseUpY}
+                    show={state.choosingBoxShow}>
                 </ChoosingBox>
-
-                <CommandBox
-                    positionX={this.state.mouseDownX}
-                    positionY={this.state.mouseDownY + this.state.choosingBoxHeight + 5}
-                    //width={}
-                    //height={}
-                    show={this.state.commandBoxShow}>
-                </CommandBox>
 
                 <Img src={this.props['imgSrc']}/>
             </div>
