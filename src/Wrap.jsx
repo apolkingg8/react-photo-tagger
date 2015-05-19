@@ -65,13 +65,6 @@ var Wrap = React.createClass({
         return result
     },
 
-    componentDidMount: function() {
-
-        this.setState({
-            offsetTop: this.getDOMNode().offsetTop,
-            offsetLeft: this.getDOMNode().offsetLeft
-        });
-    },
 
     onMouseMoveHandler: function(e) {
         var that = this;
@@ -84,8 +77,6 @@ var Wrap = React.createClass({
                 mouseX: that._getRelativedX(e),
                 mouseY: that._getRelativedY(e),
             });
-        } else {
-
         }
     },
 
@@ -137,6 +128,19 @@ var Wrap = React.createClass({
             height: this.props['height'],
             overflow: 'visible'
         };
+    },
+
+    componentDidMount: function() {
+
+        this.setState({
+            offsetTop: this.getDOMNode().offsetTop,
+            offsetLeft: this.getDOMNode().offsetLeft
+        });
+    },
+
+    shouldComponentUpdate: function(nextProps, nextState) {
+
+        return nextState.choosing
     },
 
     render: function() {
