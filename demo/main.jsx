@@ -1,13 +1,14 @@
 import React from 'react'
 import Wrap from '../react-photo-tagger'
 
+
 React.render(
     <Wrap
         imgSrc="test.jpeg"
         width="250px"
         height="200px"
         choosingBoxStyle={{
-            border: '#fff 1px solid'
+            //border: '#fff 1px'
         }}
         commandBoxStyle={{
             borderRadius: '5px'

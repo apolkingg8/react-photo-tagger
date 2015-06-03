@@ -1,7 +1,10 @@
 import React from 'react'
+import _ from 'underscore'
 
 import Img from './Img'
 import ChoosingBox from './ChoosingBox'
+import CommandBox from './CommandBox'
+
 
 
 
@@ -48,7 +51,6 @@ var Wrap = React.createClass({
     },
 
     _isInChoosingBox: function(e) {
-
         let x = this._getRelativedX(e);
         let y = this._getRelativedY(e);
 
@@ -65,6 +67,17 @@ var Wrap = React.createClass({
         return result
     },
 
+    _isInCommandBox: function(e) {
+        let x = this._getRelativedX(e);
+        let y = this._getRelativedY(e);
+        let commandBoxStyle = this._getCommandBoxStyle();
+
+        return (
+            (commandBoxStyle.left > x) && ((commandBoxStyle.left + commandBoxStyle.width) < x)
+                &&
+            (commandBoxStyle.top > y) && ((commandBoxStyle.top + commandBoxStyle.height) < y)
+        )
+    },
 
     onMouseMoveHandler: function(e) {
         var that = this;
@@ -83,7 +96,7 @@ var Wrap = React.createClass({
     onMouseDownHandler: function(e) {
         console.log('mouse down', e);
 
-        if(!this._isInChoosingBox(e)) {
+        if(!this._isInChoosingBox(e) && !this._isInCommandBox(e)) {
             e.preventDefault();
             this.setState({
                 choosing: true,
@@ -140,13 +153,46 @@ var Wrap = React.createClass({
 
     shouldComponentUpdate: function(nextProps, nextState) {
 
-        return nextState.choosing
+        //return nextState.choosing
+        return true
+    },
+
+    _getChoosingBoxStyle: function() {
+        let state = this.state;
+        let startX = state.mouseDownX,
+            startY = state.mouseDownY,
+            endX = state.choosing ? state.mouseX : state.mouseUpX,
+            endY= state.choosing ? state.mouseY : state.mouseUpY;
+
+        let style = this.props['choosingBoxStyle'];
+
+        _.extend(style, {
+            top: startY < endY ? startY : endY,
+            left: startX < endX ? startX : endX,
+            width: Math.abs(startX - endX),
+            height: Math.abs(startY - endY)
+        });
+
+        return style
+    },
+
+    _getCommandBoxStyle: function() {
+        let choosingBoxStyle = this._getChoosingBoxStyle();
+
+        let style = this.props['commandBoxStyle'];
+
+        return _.extend({width: 80, height: 50}, style, {
+            top: choosingBoxStyle.top + choosingBoxStyle.height + 15,
+            left: choosingBoxStyle.left - 5
+        });
     },
 
     render: function() {
-        console.log('render');
+        //console.log('render', this.state);
 
         let state = this.state;
+
+
 
         return (
             <div className="react-photo-tagger-wrap"
@@ -156,14 +202,14 @@ var Wrap = React.createClass({
                  style={this.getStyle()}>
 
                 <ChoosingBox
-                    _style={this.props['choosingBoxStyle']}
-                    commandBoxStyle={this.props['commandBoxStyle']}
-                    startX={state.mouseDownX}
-                    startY={state.mouseDownY}
-                    endX={state.choosing ? state.mouseX : state.mouseUpX}
-                    endY={state.choosing ? state.mouseY : state.mouseUpY}
+                    style={this._getChoosingBoxStyle()}
                     show={state.choosingBoxShow}>
                 </ChoosingBox>
+
+                <CommandBox
+                    style={this._getCommandBoxStyle()}
+                    show={state.commandBoxShow}>
+                </CommandBox>
 
                 <Img src={this.props['imgSrc']}/>
             </div>
